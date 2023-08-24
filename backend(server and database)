@@ -1,0 +1,36 @@
+const express = require('express');
+const mysql = require('mysql');
+const app = express();
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'your_db_user',
+    password: 'your_db_password',
+    database: 'SCHOOL_DB'
+});
+
+db.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to the database');
+});
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.post('/enroll', (req, res) => {
+    const { rollNo, fullName, class, birthDate, address, enrollmentDate } = req.body;
+    const query = 'INSERT INTO STUDENT_TABLE (RollNo, FullName, Class, BirthDate, Address, EnrollmentDate) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(query, [rollNo, fullName, class, birthDate, address, enrollmentDate], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error saving data');
+        } else {
+            console.log('Data saved successfully');
+            res.status(200).send('Data saved successfully');
+        }
+    });
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
